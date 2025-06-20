@@ -4,6 +4,7 @@ import type { Liga } from '../types/Liga';
 import type { Equipo } from '../types/Equipo';
 import { obtenerLigaPorId, obtenerEquiposDeLiga } from '../api/Liga';
 
+
 const LigaDetalle = () => {
   const { id } = useParams<{ id: string }>();
   const [liga, setLiga] = useState<Liga | null>(null);

@@ -1,4 +1,5 @@
 import AppRoutes from './routes';
+import "tailwindcss";
 
 function App() {
   return <AppRoutes />;
