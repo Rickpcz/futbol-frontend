@@ -1,6 +1,7 @@
 export interface Equipo {
   id: number;
   nombre: string;
-  pais: string;
   logo: string;
+  pais: string;
+  ligaId?: number;
 }

@@ -1,14 +1,15 @@
 // src/routes/index.tsx
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Ligas from "../pages/Ligas";
 import LigaDetalle from "../pages/LigaDetalle";
 import Layout from "../components/Layout";
+import HomePage from "../pages/Home";
 
 const AppRoutes = () => (
   <BrowserRouter>
     <Layout>
       <Routes>
-        <Route path="/" element={<Navigate to="/ligas" replace />} />
+         <Route path="/" element={<HomePage />} />
         <Route path="/ligas" element={<Ligas />} />
         <Route path="/ligas/:id" element={<LigaDetalle />} />
       </Routes>

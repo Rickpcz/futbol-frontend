@@ -4,4 +4,5 @@ export interface Liga {
   pais: string;
   tipo: string;
   temporada: string;
+  logo: string;
 }
