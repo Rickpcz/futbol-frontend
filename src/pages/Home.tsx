@@ -13,6 +13,7 @@ import type { Equipo } from "../types/Equipo";
 import type { PartidoExterno } from "../types/PartidosExternos";
 import type { Fichaje } from "../types/Fichaje";
 import "../datepicker-custom.css";
+import { FaSearch } from "react-icons/fa";
 
 export default function HomePage() {
     const [ligas, setLigas] = useState<Liga[]>([]);
@@ -20,6 +21,8 @@ export default function HomePage() {
     const [partidosExternos, setPartidosExternos] = useState<PartidoExterno[]>([]);
     const [fichajes, setFichajes] = useState<Fichaje[]>([]);
     const [fechaSeleccionada, setFechaSeleccionada] = useState<Date>(new Date());
+
+
 
     const cargarDatos = async (fecha: Date) => {
         const fechaStr = format(fecha, "yyyy-MM-dd");
@@ -48,6 +51,7 @@ export default function HomePage() {
     useEffect(() => {
         cargarDatos(fechaSeleccionada);
     }, [fechaSeleccionada]);
+    
 
     const partidosPorLiga = partidosExternos.reduce((acc, partido) => {
         const key = partido.liga;
@@ -65,7 +69,7 @@ export default function HomePage() {
                 {/* IZQUIERDA - LIGAS */}
                 <aside className="lg:col-span-1 bg-[#121212] rounded-xl p-4 shadow">
                     <h2 className="text-lg font-bold mb-3 text-[#B08D57]">Ligas populares</h2>
-                    <ul className="space-y-2 text-sm">
+                    <ul className="space-y-5 text-sm">
                         {ligas.slice(0, 6).map((liga) => (
                             <li key={liga.id} className="flex items-center gap-2">
                                 <img src={liga.logo} alt={liga.nombre} className="w-6 h-6 object-contain" />
@@ -80,18 +84,46 @@ export default function HomePage() {
 
                 {/* CENTRO - PARTIDOS */}
                 <main className="lg:col-span-2 space-y-6">
-                    <div className="bg-[#1C1C1C] rounded-xl p-4 flex items-center justify-center">
-                        <DatePicker
-                            selected={fechaSeleccionada}
-                            onChange={(date: Date | null) => {
-                                if (date) setFechaSeleccionada(date);
-                            }}
-                            dateFormat="dd/MM/yyyy"
-                            className="bg-[#1C1C1C] text-white px-4 py-2 rounded-md text-center w-full"
-                            calendarClassName="react-datepicker"
-                        />
+                    <div className="bg-[#1C1C1C] rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 mb-6">
+                        {/* Flechas y Fecha */}
+                        <div className="flex items-center gap-2">
+                            <button className="text-white bg-[#333] hover:bg-[#444] w-8 h-8 flex items-center justify-center rounded-full">&lt;</button>
+                            <DatePicker
+                                selected={fechaSeleccionada}
+                                onChange={(date: Date | null) => {
+                                    if (date) setFechaSeleccionada(date);
+                                }}
+                                dateFormat="dd/MM/yyyy"
+                                className="bg-transparent text-white font-semibold text-lg text-center focus:outline-none"
+                                calendarClassName="react-datepicker"
+                            />
+                            <button className="text-white bg-[#333] hover:bg-[#444] w-8 h-8 flex items-center justify-center rounded-full">&gt;</button>
+                        </div>
 
+                        {/* Filtros */}
+                        <div className="flex flex-wrap gap-2 items-center">
+                            <button className="bg-white text-black font-semibold px-4 py-1 rounded-full text-sm hover:bg-[#B08D57]">
+                                En juego
+                            </button>
+                            <button className="bg-white text-black font-semibold px-4 py-1 rounded-full text-sm hover:bg-[#B08D57]">
+                                En TV
+                            </button>
+                            <button className="bg-white text-black font-semibold px-4 py-1 rounded-full text-sm hover:bg-[#B08D57]">
+                                Por horario
+                            </button>
+
+                            {/* Campo Filtro */}
+                            <div className="flex items-center bg-[#2B2B2B] rounded-full px-3 py-1 gap-2">
+                                <FaSearch className="text-gray-400 text-sm" />
+                                <input
+                                    type="text"
+                                    placeholder="Filtro"
+                                    className="bg-transparent text-white text-sm placeholder-gray-400 focus:outline-none"
+                                />
+                            </div>
+                        </div>
                     </div>
+
                     {Object.entries(partidosPorLiga).map(([liga, juegos]) => (
                         <section key={liga} className="bg-[#1C1C1C] rounded-xl p-4">
                             <div className="flex items-center gap-2 mb-3">
