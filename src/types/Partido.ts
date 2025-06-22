@@ -1,10 +1,10 @@
 export interface Partido {
   id: number;
-  equipoLocal: string;
-  equipoVisitante: string;
+  equipoLocalId: number;
+  equipoVisitanteId: number;
   golesLocal: number | null;
   golesVisitante: number | null;
   fecha: string;
-  estado?: string;
+  estado?: string | { long?: string; short?: string; elapsed?: number };
   ligaId?: number;
 }

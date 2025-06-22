@@ -25,7 +25,7 @@ export default function Header() {
 
       <nav className="hidden lg:flex gap-6 text-sm font-semibold">
         <a href="#" className="hover:text-green-400">Partidos y Resultados</a>
-        <a href="#" className="hover:text-green-400">Equipos y Plantillas</a>
+        <a href="/equipos" className="hover:text-green-400">Equipos y Plantillas</a>
         <a href="#" className="hover:text-yellow-300">Ligas y Competencias</a>
       </nav>
 
