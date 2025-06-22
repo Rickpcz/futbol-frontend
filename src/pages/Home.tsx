@@ -28,18 +28,17 @@ export default function HomePage() {
   const cargarDatos = async (fecha: Date) => {
     const fechaStr = format(fecha, "yyyy-MM-dd");
 
-    const [ligasRes, equiposRes, partidosRes, fichajesBase] = await Promise.all(
-      [
-        obtenerLigas(),
-        obtenerEquipos(),
-        obtenerPartidosExternosPorFecha(fechaStr),
-        obtenerFichajesRecientes(),
-      ]
-    );
+    const [ligasRes, equiposRes, partidosRes, fichajesBase] = await Promise.all([
+  obtenerLigas(),
+  obtenerEquipos(), // devuelve objeto con metadata
+  obtenerPartidosExternosPorFecha(fechaStr),
+  obtenerFichajesRecientes()
+]);
 
-    setLigas(ligasRes);
-    setEquipos(equiposRes);
-    setPartidosExternos(partidosRes);
+setLigas(ligasRes);
+setEquipos(equiposRes.data); // 🔧 aquí estaba el error
+setPartidosExternos(partidosRes);
+
 
     const fichajesConFotos = await Promise.all(
       fichajesBase.slice(0, 5).map(async (fichaje) => {

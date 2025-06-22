@@ -11,7 +11,6 @@ import type { Equipo } from "../types/Equipo";
 import type { Jugador } from "../types/Jugador";
 import type { Partido } from "../types/Partido";
 import { format } from "date-fns";
-import { getErrorMessage } from "../helpers/errorHandler";
 
 export default function DetalleEquipoPage() {
   const { id } = useParams();
@@ -41,14 +40,14 @@ export default function DetalleEquipoPage() {
   useEffect(() => {
     const cargarEquipos = async () => {
       try {
-        const equiposTodos = await obtenerEquipos();
+        const equiposTodos = await obtenerEquipos(); // ← devuelve objeto paginado
         const dic: Record<number, { nombre: string; logo: string }> = {};
-        equiposTodos.forEach(eq => {
+        equiposTodos.data.forEach(eq => {
           dic[eq.id] = { nombre: eq.nombre, logo: eq.logo };
         });
         setEquiposDic(dic);
       } catch (err) {
-        getErrorMessage(err);
+        console.error("Error al cargar equipos:", err);
       }
     };
     cargarEquipos();
@@ -71,13 +70,21 @@ export default function DetalleEquipoPage() {
           }
         }
 
+        // Obtener jugadores (BD o API externa)
         try {
-          const jugadoresData = await obtenerJugadoresDeEquipo(Number(id));
+          let jugadoresData = await obtenerJugadoresDeEquipo(Number(id));
+          if (jugadoresData.length === 0) {
+            const res = await fetch(`/api/equipos/${id}/jugadores`);
+            if (res.ok) {
+              jugadoresData = await res.json();
+            }
+          }
           setJugadores(jugadoresData);
         } catch {
           setJugadores([]);
         }
 
+        // Obtener partidos
         try {
           const partidosData = await obtenerPartidosDeEquipo(Number(id));
           setPartidos(partidosData);
@@ -133,8 +140,8 @@ export default function DetalleEquipoPage() {
                 <h2 className="text-xl font-bold text-[#B08D57]">Partidos Recientes</h2>
                 <button
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition 
-                    ${ordenAscendente 
-                      ? "bg-[#B08D57] text-black border-[#B08D57] hover:bg-[#d1b07a]" 
+                    ${ordenAscendente
+                      ? "bg-[#B08D57] text-black border-[#B08D57] hover:bg-[#d1b07a]"
                       : "bg-[#232323] text-[#B08D57] border-[#B08D57] hover:bg-[#B08D57] hover:text-black"}`}
                   onClick={() => setOrdenAscendente(!ordenAscendente)}
                   title="Cambiar orden de fecha"
@@ -175,22 +182,22 @@ export default function DetalleEquipoPage() {
                             )}
                             {equiposDic[p.equipoLocalId]?.nombre || p.equipoLocalId}
                           </td>
-                          <td className="px-4 py-2">{
-                            p.golesLocal !== null && p.golesVisitante !== null
+                          <td className="px-4 py-2">
+                            {p.golesLocal !== null && p.golesVisitante !== null
                               ? `${p.golesLocal} - ${p.golesVisitante}`
-                              : "-"
-                          }</td>
+                              : "-"}
+                          </td>
                           <td className="px-4 py-2 flex items-center gap-2">
                             {equiposDic[p.equipoVisitanteId]?.logo && (
                               <img src={equiposDic[p.equipoVisitanteId].logo} alt="" className="w-6 h-6 object-contain" />
                             )}
                             {equiposDic[p.equipoVisitanteId]?.nombre || p.equipoVisitanteId}
                           </td>
-                          <td className="px-4 py-2">{
-                            typeof p.estado === "object"
+                          <td className="px-4 py-2">
+                            {typeof p.estado === "object"
                               ? (p.estado?.short || p.estado?.long || "")
-                              : (p.estado || "N/A")
-                          }</td>
+                              : (p.estado || "N/A")}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -200,7 +207,8 @@ export default function DetalleEquipoPage() {
                       <button
                         key={i + 1}
                         onClick={() => setPaginaActual(i + 1)}
-                        className={`px-3 py-1 rounded text-sm ${paginaActual === i + 1 ? "bg-[#B08D57] text-black" : "bg-[#1C1C1C] text-white"}`}
+                        className={`px-3 py-1 rounded text-sm ${paginaActual === i + 1 ? "bg-[#B08D57] text-black" : "bg-[#1C1C1C] text-white"
+                          }`}
                       >
                         {i + 1}
                       </button>
@@ -218,4 +226,4 @@ export default function DetalleEquipoPage() {
       </div>
     </div>
   );
-}   
+}

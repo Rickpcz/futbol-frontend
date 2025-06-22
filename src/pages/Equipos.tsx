@@ -17,37 +17,48 @@ export default function EquiposPage() {
   const [paisSeleccionado, setPaisSeleccionado] = useState<string>("");
   const [busqueda, setBusqueda] = useState<string>("");
 
+  const [pagina, setPagina] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(1);
+
   useEffect(() => {
     const cargarInicial = async () => {
-      const [equiposData, ligasData] = await Promise.all([
-        obtenerEquipos(),
+      const [equiposRes, ligasData] = await Promise.all([
+        obtenerEquipos(pagina),
         obtenerLigas(),
       ]);
-      setEquipos(equiposData);
+
+      const listaEquipos = equiposRes.data;
+      setEquipos(listaEquipos);
       setLigas(ligasData);
+      setTotalPaginas(equiposRes.totalPages);
 
       const paisesUnicos = Array.from(
-        new Set(equiposData.map((e) => e.pais))
-      ).filter(Boolean);
+        new Set(listaEquipos.map((e) => e.pais))
+      ).filter((p): p is string => Boolean(p));
       setPaises(paisesUnicos);
     };
+
     cargarInicial();
-  }, []);
+  }, [pagina]);
 
   const manejarFiltroPorLiga = async (ligaId: number) => {
     setLigaSeleccionada(ligaId);
     setPaisSeleccionado("");
     setBusqueda("");
+    setPagina(1);
     const equiposPorLiga = await obtenerEquiposPorLiga(ligaId);
     setEquipos(equiposPorLiga);
+    setTotalPaginas(1);
   };
 
   const manejarFiltroPorPais = async (pais: string) => {
     setPaisSeleccionado(pais);
     setLigaSeleccionada("");
     setBusqueda("");
+    setPagina(1);
     const equiposPorPais = await obtenerEquiposPorPais(pais);
     setEquipos(equiposPorPais);
+    setTotalPaginas(1);
   };
 
   const obtenerNombreLiga = (ligaId?: number) => {
@@ -133,28 +144,57 @@ export default function EquiposPage() {
           </div>
 
           {equiposFiltrados.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {equiposFiltrados.map((equipo) => (
-                <Link
-                  to={`/equipo/${equipo.id}`}
-                  key={equipo.id}
-                  className="bg-[#1C1C1C] rounded-xl p-4 flex flex-col items-center text-center hover:bg-[#2a2a2a] transition"
-                >
-                  <img
-                    src={equipo.logo}
-                    alt={equipo.nombre}
-                    className="w-16 h-16 object-contain mb-2"
-                  />
-                  <h3 className="text-lg font-semibold">{equipo.nombre}</h3>
-                  <p className="text-sm text-gray-400">{equipo.pais}</p>
-                  <p className="text-sm text-[#B08D57]">
-                    {obtenerNombreLiga(equipo.ligaId)}
-                  </p>
-                </Link>
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {equiposFiltrados.map((equipo) => (
+                  <Link
+                    to={`/equipo/${equipo.id}`}
+                    key={equipo.id}
+                    className="bg-[#1C1C1C] rounded-xl p-4 flex flex-col items-center text-center hover:bg-[#2a2a2a] transition"
+                  >
+                    <img
+                      src={equipo.logo}
+                      alt={equipo.nombre}
+                      className="w-16 h-16 object-contain mb-2"
+                    />
+                    <h3 className="text-lg font-semibold">{equipo.nombre}</h3>
+                    <p className="text-sm text-gray-400">{equipo.pais}</p>
+                    <p className="text-sm text-[#B08D57]">
+                      {obtenerNombreLiga(equipo.ligaId)}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+
+              {/* Paginación */}
+              {ligaSeleccionada === "" && paisSeleccionado === "" && (
+                <div className="flex justify-center items-center mt-8 gap-4">
+                  <button
+                    onClick={() => setPagina((prev) => Math.max(prev - 1, 1))}
+                    disabled={pagina === 1}
+                    className="px-4 py-2 bg-[#2a2a2a] text-white rounded disabled:opacity-50"
+                  >
+                    ← Anterior
+                  </button>
+
+                  <span className="text-[#B08D57] font-semibold">
+                    Página {pagina} de {totalPaginas}
+                  </span>
+
+                  <button
+                    onClick={() =>
+                      setPagina((prev) => Math.min(prev + 1, totalPaginas))
+                    }
+                    disabled={pagina === totalPaginas}
+                    className="px-4 py-2 bg-[#2a2a2a] text-white rounded disabled:opacity-50"
+                  >
+                    Siguiente →
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
-            <p className="text-center text-gray-400">
+            <p className="text-center text-gray-400 mt-10">
               No se encontraron equipos que coincidan con la búsqueda.
             </p>
           )}

@@ -34,19 +34,14 @@ export default function Header() {
         <a href="#" className="hover:text-green-400">
           Partidos y Resultados
         </a>
-        <Link
-        to={"/equipos"}>
-        <a className="hover:text-green-400">
+        <Link to="/equipos" className="hover:text-green-400">
           Equipos y Plantillas
-        </a>
         </Link>
-        <Link 
-        to={"/ligas"}>
-          <a className="hover:text-yellow-300">
-            Ligas y Competencias
-          </a>
+        <Link to="/ligas" className="hover:text-yellow-300">
+          Ligas y Competencias
         </Link>
       </nav>
+
 
       <button
         onClick={() => setMenuAbierto(!menuAbierto)}
