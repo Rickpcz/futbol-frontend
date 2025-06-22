@@ -18,6 +18,9 @@ import type { Fichaje } from "../types/Fichaje";
 import "../datepicker-custom.css";
 import ShimmerCardLista from "../components/ShimmerLoading";
 
+
+import { addDays, isToday, startOfDay } from "date-fns";
+
 export default function HomePage() {
   const [ligas, setLigas] = useState<Liga[]>([]);
   const [equipos, setEquipos] = useState<Equipo[]>([]);
@@ -25,24 +28,23 @@ export default function HomePage() {
   const [fichajes, setFichajes] = useState<Fichaje[]>([]);
   const [fechaSeleccionada, setFechaSeleccionada] = useState<Date>(new Date());
   const [cargandoPartidos, setCargandoPartidos] = useState(true);
+  const [filtroEstado, setFiltroEstado] = useState<"Todos" | "Finalizados" | "Por jugar">("Todos");
+  const [filtroTexto, setFiltroTexto] = useState("");
 
   const cargarDatos = async (fecha: Date) => {
     setCargandoPartidos(true);
     const fechaStr = format(fecha, "yyyy-MM-dd");
 
-    const [ligasRes, equiposRes, partidosRes, fichajesBase] = await Promise.all(
-      [
-        obtenerLigas(),
-        obtenerEquipos(),
-        obtenerPartidosExternosPorFecha(fechaStr),
-        obtenerFichajesRecientes(),
-      ]
-    );
+    const [ligasRes, equiposRes, partidosRes, fichajesBase] = await Promise.all([
+      obtenerLigas(),
+      obtenerEquipos(),
+      obtenerPartidosExternosPorFecha(fechaStr),
+      obtenerFichajesRecientes(),
+    ]);
 
-setLigas(ligasRes);
-setEquipos(equiposRes.data); // 🔧 aquí estaba el error
-setPartidosExternos(partidosRes);
-
+    setLigas(ligasRes);
+    setEquipos(equiposRes.data);
+    setPartidosExternos(partidosRes);
 
     const fichajesConFotos = await Promise.all(
       fichajesBase.slice(0, 5).map(async (fichaje) => {
@@ -59,7 +61,20 @@ setPartidosExternos(partidosRes);
     cargarDatos(fechaSeleccionada);
   }, [fechaSeleccionada]);
 
-  const partidosPorLiga = partidosExternos.reduce((acc, partido) => {
+  const partidosFiltrados = partidosExternos.filter((p) => {
+    const estadoOk =
+      filtroEstado === "Todos" ||
+      (filtroEstado === "Finalizados" && p.estado === "Match Finished") ||
+      (filtroEstado === "Por jugar" && p.estado !== "Match Finished");
+
+    const textoOk =
+      p.local.toLowerCase().includes(filtroTexto.toLowerCase()) ||
+      p.visitante.toLowerCase().includes(filtroTexto.toLowerCase());
+
+    return estadoOk && textoOk;
+  });
+
+  const partidosPorLiga = partidosFiltrados.reduce((acc, partido) => {
     const key = partido.liga;
     if (!acc[key]) acc[key] = [];
     acc[key].push(partido);
@@ -99,30 +114,75 @@ setPartidosExternos(partidosRes);
         {/* CENTRO */}
         <main className="md:col-span-6 space-y-6">
           <div className="bg-[#1C1C1C] rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-lg">
-            <div className="flex items-center gap-2">
-              <button className="text-white bg-[#333] hover:bg-[#444] w-8 h-8 flex items-center justify-center rounded-full">&lt;</button>
-              <DatePicker
-                selected={fechaSeleccionada}
-                onChange={(date: Date | null) => date && setFechaSeleccionada(date)}
-                dateFormat="dd/MM/yyyy"
-                className="bg-transparent text-white font-semibold text-lg text-center focus:outline-none"
-                calendarClassName="react-datepicker"
-              />
-              <button className="text-white bg-[#333] hover:bg-[#444] w-8 h-8 flex items-center justify-center rounded-full">&gt;</button>
+
+            <div className="flex items-center gap-2 justify-between w-full">
+              <div className="flex items-center gap-2">
+                <button
+                  className="text-white bg-[#333] hover:bg-[#444] w-8 h-8 flex items-center justify-center rounded-full"
+                  onClick={() => setFechaSeleccionada((prev) => addDays(prev, -1))}
+                  aria-label="Día anterior"
+                >
+                  &lt;
+                </button>
+                <DatePicker
+                  selected={fechaSeleccionada}
+                  onChange={(date: Date | null) => date && setFechaSeleccionada(date)}
+                  dateFormat="dd/MM/yyyy"
+                  className="bg-transparent text-white font-semibold text-lg text-center focus:outline-none"
+                  calendarClassName="react-datepicker"
+                />
+                <button
+                  className="text-white bg-[#333] hover:bg-[#444] w-8 h-8 flex items-center justify-center rounded-full"
+                  onClick={() => setFechaSeleccionada((prev) => addDays(prev, 1))}
+                  aria-label="Día siguiente"
+                >
+                  &gt;
+                </button>
+              </div>
+              <button
+                className={`px-4 py-1 rounded-full font-semibold transition ${isToday(startOfDay(fechaSeleccionada))
+                    ? "bg-[#B08D57] text-black hover:bg-[#4CCC6C]"
+                    : "bg-[#333] text-white hover:bg-[#B08D57] hover:text-black"
+                  }`}
+                onClick={() => setFechaSeleccionada(startOfDay(new Date()))}
+              >
+                Hoy
+              </button>
             </div>
+
+
             <div className="flex flex-wrap gap-2 items-center">
-              {["En juego", "En TV", "Por horario"].map((filtro, i) => (
-                <button key={i} className="bg-white text-black font-semibold px-4 py-1 rounded-full text-sm hover:bg-[#B08D57]">{filtro}</button>
+              {["Todos", "Finalizados", "Por jugar"].map((filtro) => (
+                <button
+                  key={filtro}
+                  className={`px-4 py-1 rounded-full text-sm font-semibold ${filtroEstado === filtro
+                    ? "bg-[#B08D57] text-white"
+                    : "bg-[#333] hover:bg-[#444]"
+                    }`}
+                  onClick={() => setFiltroEstado(filtro as "Todos" | "Finalizados" | "Por jugar")}
+                >
+                  {filtro}
+                </button>
               ))}
               <div className="flex items-center bg-[#2B2B2B] rounded-full px-3 py-1 gap-2">
                 <FaSearch className="text-gray-400 text-sm" />
-                <input type="text" placeholder="Filtro" className="bg-transparent text-white text-sm placeholder-gray-400 focus:outline-none" />
+                <input
+                  type="text"
+                  placeholder="Filtro"
+                  value={filtroTexto}
+                  onChange={(e) => setFiltroTexto(e.target.value)}
+                  className="bg-transparent text-white text-sm placeholder-gray-400 focus:outline-none"
+                />
               </div>
             </div>
           </div>
 
           {cargandoPartidos ? (
             <ShimmerCardLista cantidad={5} />
+          ) : Object.keys(partidosPorLiga).length === 0 ? (
+            <div className="text-center text-gray-400 text-sm">
+              No hay partidos disponibles.
+            </div>
           ) : (
             Object.entries(partidosPorLiga).map(([liga, juegos]) => (
               <section key={liga} className="bg-[#1C1C1C] rounded-2xl p-5 shadow-lg">
@@ -170,7 +230,10 @@ setPartidosExternos(partidosRes);
               <ul className="space-y-3 text-sm">
                 {equipos.slice(0, 4).map((equipo) => (
                   <li key={equipo.id} className="flex items-center gap-3">
-                    <Link to={`/equipo/${equipo.id}`} className="flex items-center gap-3 hover:text-[#B08D57] hover:scale-105 transition duration-300 cursor-pointer">
+                    <Link
+                      to={`/equipo/${equipo.id}`}
+                      className="flex items-center gap-3 hover:text-[#B08D57] hover:scale-105 transition duration-300 cursor-pointer"
+                    >
                       <img src={equipo.logo} alt={equipo.nombre} className="w-6 h-6 object-contain" />
                       {equipo.nombre}
                     </Link>
