@@ -9,6 +9,7 @@ export default function Header() {
 
   return (
     <header className="bg-[#1a1a1a] text-white px-4 py-3 shadow-md flex items-center justify-between sticky top-0 w-full z-50 h-23">
+      {/* Logo */}
       <Link to="/" className="flex items-center gap-2">
         <img
           src={logo}
@@ -17,6 +18,7 @@ export default function Header() {
         />
       </Link>
 
+      {/* Input de búsqueda (desktop) */}
       <div className="relative hidden md:block w-1/3">
         <input
           type="text"
@@ -28,18 +30,25 @@ export default function Header() {
         <FaSearch className="absolute left-3 top-2.5 text-gray-400 text-base" />
       </div>
 
-      <nav className="hidden lg:flex gap-6 text-sm font-semibold">
-        <a href="#" className="hover:text-green-400">
-          Partidos y Resultados
-        </a>
-        <Link to={"/equipos"} className="hover:text-green-400">
-          Equipos y Plantillas
+      {/* Navegación desktop */}
+      <nav className="hidden lg:flex gap-8 text-sm font-medium">
+        <Link to="/" className="relative group transition text-white">
+          Partidos
+          <span className="absolute bottom-[-4px] left-0 w-0 h-[2px] bg-[#4CCC6C] group-hover:w-full transition-all duration-300"></span>
         </Link>
-        <Link to={"/ligas"} className="hover:text-yellow-300">
-          Ligas y Competencias
+
+        <Link to="/equipos" className="relative group transition text-white">
+          Equipos
+          <span className="absolute bottom-[-4px] left-0 w-0 h-[2px] bg-[#4CCC6C] group-hover:w-full transition-all duration-300"></span>
+        </Link>
+
+        <Link to="/ligas" className="relative group transition text-white">
+          Ligas
+          <span className="absolute bottom-[-4px] left-0 w-0 h-[2px] bg-[#B08D57] group-hover:w-full transition-all duration-300"></span>
         </Link>
       </nav>
 
+      {/* Botón menú hamburguesa (mobile) */}
       <button
         onClick={() => setMenuAbierto(!menuAbierto)}
         className="lg:hidden text-white text-2xl focus:outline-none transition"
@@ -47,8 +56,10 @@ export default function Header() {
         {menuAbierto ? <FaTimes /> : <FaBars />}
       </button>
 
+      {/* Menú mobile */}
       {menuAbierto && (
         <div className="absolute top-full left-0 w-full bg-[#1a1a1a] border-t border-[#2B2B2B] flex flex-col items-center gap-4 py-6 lg:hidden z-40 shadow-md animate-fade-in">
+          {/* Input mobile */}
           <div className="w-11/12 relative">
             <input
               type="text"
@@ -59,6 +70,7 @@ export default function Header() {
             />
             <FaSearch className="absolute left-3 top-2.5 text-gray-400 text-base" />
           </div>
+          {/* Enlaces */}
           <Link
             to="/"
             onClick={() => setMenuAbierto(false)}
