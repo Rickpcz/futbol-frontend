@@ -28,20 +28,15 @@ export default function Header() {
         <FaSearch className="absolute left-3 top-2.5 text-gray-400 text-base" />
       </div>
 
-      <nav className="hidden lg:flex gap-8 text-sm font-medium">
-        <Link to="/" className="relative group transition text-white">
-          Partidos
-          <span className="absolute bottom-[-4px] left-0 w-0 h-[2px] bg-[#4CCC6C] group-hover:w-full transition-all duration-300"></span>
+      <nav className="hidden lg:flex gap-6 text-sm font-semibold">
+        <a href="#" className="hover:text-green-400">
+          Partidos y Resultados
+        </a>
+        <Link to={"/equipos"} className="hover:text-green-400">
+          Equipos y Plantillas
         </Link>
-
-        <Link to="/equipos" className="relative group transition text-white">
-          Equipos
-          <span className="absolute bottom-[-4px] left-0 w-0 h-[2px] bg-[#4CCC6C] group-hover:w-full transition-all duration-300"></span>
-        </Link>
-
-        <Link to="/ligas" className="relative group transition text-white">
-          Ligas
-          <span className="absolute bottom-[-4px] left-0 w-0 h-[2px] bg-[#B08D57] group-hover:w-full transition-all duration-300"></span>
+        <Link to={"/ligas"} className="hover:text-yellow-300">
+          Ligas y Competencias
         </Link>
       </nav>
 
