@@ -11,6 +11,7 @@ import type { Equipo } from "../types/Equipo";
 import type { Jugador } from "../types/Jugador";
 import type { Partido } from "../types/Partido";
 import { format } from "date-fns";
+import { getErrorMessage } from "../helpers/errorHandler";
 
 export default function DetalleEquipoPage() {
   const { id } = useParams();
@@ -46,7 +47,9 @@ export default function DetalleEquipoPage() {
           dic[eq.id] = { nombre: eq.nombre, logo: eq.logo };
         });
         setEquiposDic(dic);
-      } catch (err) {}
+      } catch (err) {
+        getErrorMessage(err);
+      }
     };
     cargarEquipos();
   }, []);
