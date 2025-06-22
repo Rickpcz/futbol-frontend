@@ -8,6 +8,7 @@ import { obtenerLigas } from "../api/Liga";
 import type { Equipo } from "../types/Equipo";
 import type { Liga } from "../types/Liga";
 import { Link } from "react-router-dom";
+import ShimmerCardLista from "../components/ShimmerLoading";
 
 export default function EquiposPage() {
   const [equipos, setEquipos] = useState<Equipo[]>([]);
@@ -16,9 +17,11 @@ export default function EquiposPage() {
   const [ligaSeleccionada, setLigaSeleccionada] = useState<number | "">("");
   const [paisSeleccionado, setPaisSeleccionado] = useState<string>("");
   const [busqueda, setBusqueda] = useState<string>("");
+  const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
     const cargarInicial = async () => {
+      setCargando(true);
       const [equiposData, ligasData] = await Promise.all([
         obtenerEquipos(),
         obtenerLigas(),
@@ -30,24 +33,29 @@ export default function EquiposPage() {
         new Set(equiposData.map((e) => e.pais))
       ).filter(Boolean);
       setPaises(paisesUnicos);
+      setCargando(false);
     };
     cargarInicial();
   }, []);
 
   const manejarFiltroPorLiga = async (ligaId: number) => {
+    setCargando(true);
     setLigaSeleccionada(ligaId);
     setPaisSeleccionado("");
     setBusqueda("");
     const equiposPorLiga = await obtenerEquiposPorLiga(ligaId);
     setEquipos(equiposPorLiga);
+    setCargando(false);
   };
 
   const manejarFiltroPorPais = async (pais: string) => {
+    setCargando(true);
     setPaisSeleccionado(pais);
     setLigaSeleccionada("");
     setBusqueda("");
     const equiposPorPais = await obtenerEquiposPorPais(pais);
     setEquipos(equiposPorPais);
+    setCargando(false);
   };
 
   const obtenerNombreLiga = (ligaId?: number) => {
@@ -119,7 +127,9 @@ export default function EquiposPage() {
 
         {/* CONTENIDO PRINCIPAL */}
         <main className="lg:col-span-3">
-          <h1 className="text-2xl font-bold mb-6 text-[#B08D57]">Equipos</h1>
+          <h1 className="text-2xl font-bold mb-6 text-[#B08D57] tracking-wide">
+            Equipos
+          </h1>
 
           {/* Buscador */}
           <div className="mb-6">
@@ -128,26 +138,33 @@ export default function EquiposPage() {
               placeholder="Buscar equipo..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              className="w-full md:w-1/2 px-4 py-2 bg-[#1C1C1C] text-white border border-[#2a2a2a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B08D57] placeholder-gray-400"
+              className="w-full md:w-1/2 px-4 py-2 bg-[#1C1C1C] text-white border border-[#2a2a2a] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B08D57] placeholder-gray-400 shadow-sm"
             />
           </div>
 
-          {equiposFiltrados.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {/* Lista de equipos o shimmer */}
+          {cargando ? (
+            <ShimmerCardLista cantidad={25} />
+          ) : equiposFiltrados.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
               {equiposFiltrados.map((equipo) => (
                 <Link
                   to={`/equipo/${equipo.id}`}
                   key={equipo.id}
-                  className="bg-[#1C1C1C] rounded-xl p-4 flex flex-col items-center text-center hover:bg-[#2a2a2a] transition"
+                  className="bg-[#1C1C1C] rounded-2xl p-4 flex flex-col items-center text-center hover:bg-[#2a2a2a] transition-all duration-300 shadow-sm hover:shadow-md"
                 >
-                  <img
-                    src={equipo.logo}
-                    alt={equipo.nombre}
-                    className="w-16 h-16 object-contain mb-2"
-                  />
-                  <h3 className="text-lg font-semibold">{equipo.nombre}</h3>
-                  <p className="text-sm text-gray-400">{equipo.pais}</p>
-                  <p className="text-sm text-[#B08D57]">
+                  <div className="w-20 h-20 mb-3 flex items-center justify-center">
+                    <img
+                      src={equipo.logo}
+                      alt={equipo.nombre}
+                      className="w-full h-full object-contain transition-transform duration-300 hover:scale-105"
+                    />
+                  </div>
+                  <h3 className="text-base font-bold text-white truncate w-full">
+                    {equipo.nombre}
+                  </h3>
+                  <p className="text-sm text-gray-400 mt-1">{equipo.pais}</p>
+                  <p className="text-xs text-[#B08D57] mt-0.5">
                     {obtenerNombreLiga(equipo.ligaId)}
                   </p>
                 </Link>

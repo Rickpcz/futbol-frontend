@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { obtenerLigas } from "../api/Liga";
 import type { Liga } from "../types/Liga";
 import { Link } from "react-router-dom";
+import ShimmerCardLista from "../components/ShimmerLoading";
 
 const agruparPorLetra = (ligas: Liga[]) => {
   return ligas.reduce((acc: Record<string, Liga[]>, liga) => {
@@ -26,13 +27,22 @@ const Ligas = () => {
     cargar();
   }, []);
 
-  if (cargando) return <p className="p-4 text-white">Cargando ligas...</p>;
-
   const ligasFiltradas = ligas.filter((liga) =>
     liga.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
   const ligasPorLetra = agruparPorLetra(ligasFiltradas);
   const letrasOrdenadas = Object.keys(ligasPorLetra).sort();
+
+  if (cargando) {
+    return (
+      <div className="p-6 bg-[#121212] min-h-screen">
+        <h1 className="text-3xl font-bold text-[#d4af37] mb-4">
+          Ligas y Competencias
+        </h1>
+        <ShimmerCardLista cantidad={15} />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 bg-[#121212] min-h-screen">
