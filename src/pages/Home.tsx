@@ -105,7 +105,7 @@ export default function HomePage() {
             </ul>
           )}
           <Link to="/ligas">
-            <button className="mt-5 w-full bg-[#4CCC6C] text-white text-sm px-4 py-2 rounded-full hover:bg-[#B08D57] transition">
+            <button className="mt-5 w-full bg-[#4CCC6C] text-white text-sm px-4 py-2 rounded-full hover:bg-[#B08D57] transition cursor-pointer hover:scale-105 shadow-lg">
               Ver todas las ligas
             </button>
           </Link>
@@ -160,7 +160,7 @@ export default function HomePage() {
               {["Todos", "Finalizados", "Por jugar"].map((filtro) => (
                 <button
                   key={filtro}
-                  className={`px-4 py-1 rounded-full text-sm font-semibold ${filtroEstado === filtro
+                  className={`px-4 py-1 rounded-full text-sm cursor-pointer font-semibold ${filtroEstado === filtro
                     ? "bg-[#B08D57] text-white"
                     : "bg-[#333] hover:bg-[#444]"
                     }`}

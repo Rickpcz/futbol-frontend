@@ -172,7 +172,7 @@ export default function DetalleEquipoPage() {
               <>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                   {jugadoresPaginados.map(j => (
-                    <div key={j.id} className="bg-[#1C1C1C] p-3 rounded">
+                    <div key={j.id} className="bg-[#1C1C1C] p-3 rounded cursor-pointer hover:bg-[#2A2A2A] transition hover:scale-105">
                       <img src={j.foto} alt={j.nombre} className="w-16 h-16 mx-auto rounded-full object-cover mb-2" />
                       <h3 className="text-sm font-semibold text-center">{j.nombre}</h3>
                       <p className="text-xs text-center text-gray-400">#{j.numero} | {j.posicion}</p>
@@ -184,7 +184,7 @@ export default function DetalleEquipoPage() {
                     <button
                       key={i + 1}
                       onClick={() => setPaginaActualJugadores(i + 1)}
-                      className={`px-3 py-1 rounded text-sm ${paginaActualJugadores === i + 1 ? "bg-[#B08D57] text-black" : "bg-[#1C1C1C] text-white"}`}
+                      className={`px-3 py-1 rounded text-sm ${paginaActualJugadores === i + 1 ? "bg-[#B08D57] text-black" : "bg-[#1C1C1C] text-white"} cursor-pointer`}
                     >
                       {i + 1}
                     </button>
@@ -211,7 +211,7 @@ export default function DetalleEquipoPage() {
             {cargandoEquipos ? (
               <div className="animate-pulse space-y-2">
                 {Array.from({ length: 5 }).map((_, index) => (
-                  <div key={index} className="flex gap-4 bg-[#1C1C1C] rounded h-10"></div>
+                  <div key={index} className="flex gap-4 bg-[#1C1C1C] rounded h-10 "></div>
                 ))}
               </div>
             ) : (
@@ -261,7 +261,7 @@ export default function DetalleEquipoPage() {
                     <button
                       key={i + 1}
                       onClick={() => setPaginaActualPartidos(i + 1)}
-                      className={`px-3 py-1 rounded text-sm ${paginaActualPartidos === i + 1 ? "bg-[#B08D57] text-black" : "bg-[#1C1C1C] text-white"}`}
+                      className={`px-3 py-1 rounded text-sm ${paginaActualPartidos === i + 1 ? "bg-[#B08D57] text-black" : "bg-[#1C1C1C] text-white"} cursor-pointer`}
                     >
                       {i + 1}
                     </button>
