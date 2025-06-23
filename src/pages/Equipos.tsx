@@ -100,29 +100,6 @@ export default function EquiposPage() {
             </div>
           </div>
 
-          {/* Filtro por país */}
-          <div>
-            <label className="block text-sm text-gray-300 mb-2">
-              Selecciona un País
-            </label>
-            <div className="relative">
-              <select
-                className="appearance-none w-full bg-[#1C1C1C] text-white px-4 py-2 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B08D57]"
-                value={paisSeleccionado}
-                onChange={(e) => manejarFiltroPorPais(e.target.value)}
-              >
-                <option value="">-- Todos los países --</option>
-                {paises.map((pais, i) => (
-                  <option key={i} value={pais}>
-                    {pais}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400">
-                ▼
-              </div>
-            </div>
-          </div>
         </aside>
 
         {/* CONTENIDO PRINCIPAL */}
