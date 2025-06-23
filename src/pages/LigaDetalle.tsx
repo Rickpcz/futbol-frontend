@@ -6,11 +6,11 @@ import { obtenerResumenTemporada } from "../api/ResumenTemporada";
 import type { Standing } from "../types/Standing";
 import ShimmerCardLista from "../components/ShimmerLoading";
 
-const temporadasDisponibles = [2024, 2023, 2022];
+const temporadasDisponibles = [2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016];
 
 export default function LigaDetalle() {
   const { id } = useParams<{ id: string }>();
-  const [temporada, setTemporada] = useState<number>(2024);
+  const [temporada, setTemporada] = useState<number>(2023);
   const [tabla, setTabla] = useState<Standing[]>([]);
   const [cargando, setCargando] = useState<boolean>(false);
 
@@ -92,13 +92,13 @@ export default function LigaDetalle() {
                   <tbody>
                     {tabla.map((fila, i) => (
                       <tr
-                        key={fila.id || fila.equipo || i}
+                        key={fila.equipo || i}
                         className="border-b border-[#2a2a2a] hover:bg-[#2A2A2A]"
                       >
                         <td className="py-2 font-bold text-[#B08D57]">
                           {i + 1}
                         </td>
-                        <Link to={`/equipo/${fila.id}`}>
+                        <Link to={`/equipo/${fila.equipo}`}>
                           <td className="py-2 flex items-center gap-3 hover:scale-105 transition duration-300 cursor-pointer">
                             <img
                               src={fila.logo}
