@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
-import { format } from "date-fns";
+import { addDays, format, isToday, startOfDay } from "date-fns";
 import { FaSearch } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
@@ -99,17 +99,43 @@ setPartidosExternos(partidosRes);
         {/* CENTRO */}
         <main className="md:col-span-6 space-y-6">
           <div className="bg-[#1C1C1C] rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-lg">
-            <div className="flex items-center gap-2">
-              <button className="text-white bg-[#333] hover:bg-[#444] w-8 h-8 flex items-center justify-center rounded-full">&lt;</button>
-              <DatePicker
-                selected={fechaSeleccionada}
-                onChange={(date: Date | null) => date && setFechaSeleccionada(date)}
-                dateFormat="dd/MM/yyyy"
-                className="bg-transparent text-white font-semibold text-lg text-center focus:outline-none"
-                calendarClassName="react-datepicker"
-              />
-              <button className="text-white bg-[#333] hover:bg-[#444] w-8 h-8 flex items-center justify-center rounded-full">&gt;</button>
+
+            <div className="flex items-center gap-2 justify-between w-full">
+              <div className="flex items-center gap-2">
+                <button
+                  className="text-white bg-[#333] hover:bg-[#444] w-8 h-8 flex items-center justify-center rounded-full"
+                  onClick={() => setFechaSeleccionada((prev) => addDays(prev, -1))}
+                  aria-label="Día anterior"
+                >
+                  &lt;
+                </button>
+                <DatePicker
+                  selected={fechaSeleccionada}
+                  onChange={(date: Date | null) => date && setFechaSeleccionada(date)}
+                  dateFormat="dd/MM/yyyy"
+                  className="bg-transparent text-white font-semibold text-lg text-center focus:outline-none"
+                  calendarClassName="react-datepicker"
+                />
+                <button
+                  className="text-white bg-[#333] hover:bg-[#444] w-8 h-8 flex items-center justify-center rounded-full"
+                  onClick={() => setFechaSeleccionada((prev) => addDays(prev, 1))}
+                  aria-label="Día siguiente"
+                >
+                  &gt;
+                </button>
+              </div>
+              <button
+                className={`px-4 py-1 rounded-full font-semibold transition ${isToday(startOfDay(fechaSeleccionada))
+                    ? "bg-[#B08D57] text-black hover:bg-[#4CCC6C]"
+                    : "bg-[#333] text-white hover:bg-[#B08D57] hover:text-black"
+                  }`}
+                onClick={() => setFechaSeleccionada(startOfDay(new Date()))}
+              >
+                Hoy
+              </button>
             </div>
+
+
             <div className="flex flex-wrap gap-2 items-center">
               {["En juego", "En TV", "Por horario"].map((filtro, i) => (
                 <button key={i} className="bg-white text-black font-semibold px-4 py-1 rounded-full text-sm hover:bg-[#B08D57]">{filtro}</button>
