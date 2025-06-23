@@ -9,7 +9,7 @@ import EquipoDetalle from "../pages/EquipoDetalle";
 
 
 const AppRoutes = () => (
-  <BrowserRouter>
+  <BrowserRouter basename="/futbol-frontend">
     <Layout>
       <Routes>
         <Route path="/" element={<HomePage />} />
