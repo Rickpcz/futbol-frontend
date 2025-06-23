@@ -115,8 +115,8 @@ export default function HomePage() {
         <main className="md:col-span-6 space-y-6">
           <div className="bg-[#1C1C1C] rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-lg">
 
-            <div className="flex items-center gap-2 justify-between w-full">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-between w-full sm:flex-nowrap">
+              <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                 <button
                   className="text-white bg-[#333] hover:bg-[#444] w-8 h-8 flex items-center justify-center rounded-full"
                   onClick={() => setFechaSeleccionada((prev) => addDays(prev, -1))}
@@ -124,13 +124,15 @@ export default function HomePage() {
                 >
                   &lt;
                 </button>
+
                 <DatePicker
                   selected={fechaSeleccionada}
                   onChange={(date: Date | null) => date && setFechaSeleccionada(date)}
                   dateFormat="dd/MM/yyyy"
-                  className="bg-transparent text-white font-semibold text-lg text-center focus:outline-none"
+                  className="bg-transparent text-white font-semibold text-lg text-center focus:outline-none w-full sm:w-auto"
                   calendarClassName="react-datepicker"
                 />
+
                 <button
                   className="text-white bg-[#333] hover:bg-[#444] w-8 h-8 flex items-center justify-center rounded-full"
                   onClick={() => setFechaSeleccionada((prev) => addDays(prev, 1))}
@@ -139,8 +141,10 @@ export default function HomePage() {
                   &gt;
                 </button>
               </div>
+
               <button
-                className={`px-4 py-1 rounded-full font-semibold transition ${isToday(startOfDay(fechaSeleccionada))
+                className={`px-4 py-1 rounded-full font-semibold transition whitespace-nowrap sm:px-2 sm:py-0.5 sm:text-sm
+      ${isToday(startOfDay(fechaSeleccionada))
                     ? "bg-[#B08D57] text-black hover:bg-[#4CCC6C]"
                     : "bg-[#333] text-white hover:bg-[#B08D57] hover:text-black"
                   }`}
@@ -149,6 +153,7 @@ export default function HomePage() {
                 Hoy
               </button>
             </div>
+
 
 
             <div className="flex flex-wrap gap-2 items-center">
