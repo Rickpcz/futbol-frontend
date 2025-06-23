@@ -1,4 +1,8 @@
+import type { Key, ReactNode } from "react";
+
 export interface Standing {
+  equipo: Key | null | undefined;
+  diferenciaGoles: ReactNode;
   posicion: number;
   nombreEquipo: string;
   logo: string;

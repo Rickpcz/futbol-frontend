@@ -1,55 +1,133 @@
-import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import type { Liga } from '../types/Liga';
-import type { Equipo } from '../types/Equipo';
-import { obtenerLigaPorId, obtenerEquiposDeLiga } from '../api/Liga';
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 
-const LigaDetalle = () => {
+import { obtenerTablaPorLigaYTemporada } from "../api/Tabla";
+import { obtenerResumenTemporada } from "../api/ResumenTemporada";
+import type { Standing } from "../types/Standing";
+import ShimmerCardLista from "../components/ShimmerLoading";
+
+const temporadasDisponibles = [2024, 2023, 2022];
+
+export default function LigaDetalle() {
   const { id } = useParams<{ id: string }>();
-  const [liga, setLiga] = useState<Liga | null>(null);
-  const [equipos, setEquipos] = useState<Equipo[]>([]);
+  const [temporada, setTemporada] = useState<number>(2024);
+  const [tabla, setTabla] = useState<Standing[]>([]);
+  const [cargando, setCargando] = useState<boolean>(false);
 
   useEffect(() => {
     if (!id) return;
     const ligaId = parseInt(id);
-    obtenerLigaPorId(ligaId).then(setLiga);
-    obtenerEquiposDeLiga(ligaId).then(setEquipos);
-  }, [id]);
 
-  if (!liga) return <p className="p-4 text-white">Cargando liga...</p>;
+    const cargarDatos = async () => {
+      setCargando(true);
+      try {
+        const [tablaRes] = await Promise.all([
+          obtenerTablaPorLigaYTemporada(ligaId, temporada).catch(() => []),
+          obtenerResumenTemporada(ligaId, temporada).catch(() => null),
+        ]);
+
+        setTabla(tablaRes || []);
+      } catch (error) {
+        console.error("Error al cargar datos:", error);
+      } finally {
+        setCargando(false);
+      }
+    };
+
+    cargarDatos();
+  }, [id, temporada]);
 
   return (
-    <div className="p-6 bg-[#121212] min-h-screen">
-      <h1 className="text-3xl font-bold text-[#d4af37] mb-2">{liga.nombre}</h1>
-      <p className="text-gray-400 mb-6">
-        País: <span className="text-white">{liga.pais}</span> | Tipo: <span className="text-white">{liga.tipo}</span>
-      </p>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {equipos.map((equipo) => (
-          <div
-            key={equipo.id}
-            className="bg-[#1a1a1a] rounded-lg p-4 shadow-md hover:shadow-lg transition duration-300 text-white text-center"
+    <div className="bg-[#121212] text-white min-h-screen px-6 md:px-10 py-10 space-y-10">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <h1 className="text-3xl font-bold text-[#B08D57]">
+          Detalles de la Liga
+        </h1>
+        <div>
+          <label className="block text-sm text-gray-400">
+            Seleccionar temporada
+          </label>
+          <select
+            value={temporada}
+            onChange={(e) => setTemporada(Number(e.target.value))}
+            className="bg-[#1C1C1C] text-white px-4 py-2 rounded-lg border border-[#2a2a2a] focus:outline-none focus:ring-2 focus:ring-[#B08D57] cursor-pointer"
           >
-            <img
-              src={equipo.logo}
-              alt={equipo.nombre}
-              className="w-16 h-16 object-contain mx-auto mb-3 rounded"
-              referrerPolicy="no-referrer"
-            />
-            <h2 className="text-lg font-semibold">{equipo.nombre}</h2>
-            <p className="text-sm text-gray-400">País: {equipo.pais}</p>
-            <Link
-              to={`/equipos/${equipo.id}`}
-              className="inline-block mt-3 px-4 py-1 bg-[#d4af37] text-black font-semibold rounded hover:bg-yellow-500 transition"
-            >
-              Ver plantilla
-            </Link>
-          </div>
-        ))}
-      </div>
+            {temporadasDisponibles.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </div>
+      </header>
+
+      {cargando ? (
+        <>
+          <ShimmerCardLista cantidad={3} />
+          <ShimmerCardLista cantidad={1} />
+        </>
+      ) : (
+        <>
+          {/* TABLA */}
+          <section className="bg-[#1C1C1C] rounded-2xl p-5 shadow-lg w-full">
+            <h2 className="text-xl font-semibold text-[#4CCC6C] mb-4">
+              Tabla de posiciones ({temporada})
+            </h2>
+            {tabla.length === 0 ? (
+              <p className="text-sm text-gray-400">
+                No hay datos disponibles para esta temporada.
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="text-gray-400 border-b border-[#2a2a2a]">
+                    <tr>
+                      <th className="text-left py-2">#</th>
+                      <th className="text-left py-2">Equipo</th>
+                      <th className="text-center py-2">PTS</th>
+                      <th className="text-center py-2">PJ</th>
+                      <th className="text-center py-2">DG</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tabla.map((fila, i) => (
+                      <tr
+                        key={fila.id || fila.equipo || i}
+                        className="border-b border-[#2a2a2a] hover:bg-[#2A2A2A]"
+                      >
+                        <td className="py-2 font-bold text-[#B08D57]">
+                          {i + 1}
+                        </td>
+                        <Link to={`/equipo/${fila.id}`}>
+                          <td className="py-2 flex items-center gap-3 hover:scale-105 transition duration-300 cursor-pointer">
+                            <img
+                              src={fila.logo}
+                              alt={String(
+                                fila.nombreEquipo || fila.equipo || "Equipo"
+                              )}
+                              className="w-6 h-6 object-contain"
+                            />
+                            <span className="truncate">
+                              {fila.nombreEquipo || fila.equipo || "Equipo"}
+                            </span>
+                          </td>
+                        </Link>
+                        <td className="text-center py-2">{fila.puntos}</td>
+                        <td className="text-center py-2">
+                          {fila.partidosJugados}
+                        </td>
+                        <td className="text-center py-2">
+                          {fila.diferenciaGoles}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        </>
+      )}
     </div>
   );
-};
-
-export default LigaDetalle;
+}

@@ -10,6 +10,7 @@ import type { Equipo } from "../types/Equipo";
 import type { Jugador } from "../types/Jugador";
 import type { Partido } from "../types/Partido";
 import { format } from "date-fns";
+import ShimmerCardLista from "../components/ShimmerLoading";
 
 export default function DetalleEquipoPage() {
   const { id } = useParams();
@@ -58,7 +59,7 @@ export default function DetalleEquipoPage() {
   useEffect(() => {
     const cargarDatos = async () => {
       if (!id) return;
-
+      setCargando(true);
       try {
         const equipoData = await obtenerEquipoPorId(Number(id));
         setEquipo(equipoData);
